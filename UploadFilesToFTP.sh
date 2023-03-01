@@ -18,7 +18,7 @@ FAILEDPATH="/GrabacionesWAVFailed/q$1"
 inFile=""
 outFile=""
 ftpuser="administrator"
-ftppassword="MYZlQmJ731d1f5xm"
+ftppassword="PassWordFTP123"
 recordingremotehost="10.150.71.3"
 remotedir=""
 

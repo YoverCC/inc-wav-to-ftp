@@ -289,7 +289,7 @@ buildPrsFile() {
 	#armado del PRS           
 	if [ "$OS" == "Debian" ]; then	
 		if [ "${recordStereo}" != "1" ]; then
-			#Grabo en mono que consumo menos espacio en disco.
+			#Grabo en mono que consumo menos espacio en disco
 			#echo "$cmdDebian -G -m $recordingremotedir/$queueName/$in_file $recordingremotedir/$queueName/$out_file -c 1 -r 11025 $recordingremotedir/$queueName/$callId.mp3 &&" > $recordingdir/$callId.prs
 			echo "$cmdDebian -G -m $recordingremotedir/$queueName/$in_file $recordingremotedir/$queueName/$out_file -c 1 -r 11025 $recordingremotedir/$queueName/$callId.wav &&" > $recordingdir/$callId.prs
 			echo "$cmdDebian -M $recordingremotedir/$queueName/$out_file $recordingremotedir/$queueName/$in_file /GrabacionesWAV/$queueName/$callId.wav && " >> $recordingdir/$callId.prs
