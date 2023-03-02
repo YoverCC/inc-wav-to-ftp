@@ -2,7 +2,7 @@
 
 Generalmente se monta el procedimiento sobre PBX que tengan el mixeo en mp3, se requiere configurar el mixeo en wav (separado del mixeo nativo) para subirlo a un repositorio FTP que sera usado posteriormente por SpeechAnalytics o QA.
 
-Se recomienda que el FTP tenga un espacio de 3 TB aproximadamente.
+Se recomienda que el FTP tenga un espacio de 3 TB aproximadamente (dependiendo de la cantidad de llamadas que tenga el cliente, adicional se debe considerar una depuración en el FTP a modo de que no se llene el FTP).
 
 ## CONFIGURACIÓN
 
@@ -37,9 +37,11 @@ cp /home/brt001spt/inicioGrab/UploadFilesToFTP.sh /usr/sbin/
 cp /home/brt001spt/inicioGrab/UploadFailedToFTP.sh /usr/sbin/
 ```
 
-### 3. Dar permisos a los archivos copiados
+### 3. Asegurar el formato unix y dar permisos a los archivos copiados
 
 ```
+dos2unix /usr/sbin/UploadFilesToFTP.sh
+dos2unix /usr/sbin/UploadFailedToFTP.sh
 chown -R root:root /usr/sbin/UploadFilesToFTP.sh
 chmod +x /usr/sbin/UploadFilesToFTP.sh
 chown -R root:root /usr/sbin/UploadFailedToFTP.sh
@@ -47,6 +49,10 @@ chmod +x /usr/sbin/UploadFailedToFTP.sh
 ```
 
 ### 4. Programar crontab
+
+```
+nano /etc/crontab
+```
 
 ```
 # WAV Files to MW
@@ -74,7 +80,10 @@ Se debe editar con los datos correspondientes del servidor FTP y en el servidor 
     ftpuser="administrator"
     ftppassword="PassWordFTP123"
     recordingremotehost="10.150.71.3"
+    remotedir="/Speech\ Analytics"
     ```
+
+El campo remotedir se debe configurar en caso este espeficado donde debe almacenarse, en el caso de Skytel si aplica dejarlo con "Speech Analytics", el caracter "\" es usado para que se considere el espacio en el nombre de la carpeta, no debe modificarse en este caso. Si en otro ambiente va directamente en la raiz se puede dejar en blanco remotedir=""
 
 ### 6. Editar el archivo /usr/sbin/tkpostrecording.sh
 

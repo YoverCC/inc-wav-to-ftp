@@ -20,7 +20,7 @@ outFile=""
 ftpuser="administrator"
 ftppassword="PassWordFTP123"
 recordingremotehost="10.150.71.3"
-remotedir=""
+remotedir="/Speech\ Analytics"
 
 
 
@@ -64,10 +64,10 @@ main(){
 			logInfo "$inFile exist. Uploading files to MW Server"
 			logInfo "Executing FTP command"
 						
-			remotedir="speechanalytics/"$(date -r $inFile '+%Y' | bc)"/"$(date -r $inFile '+%m' | bc)"/"$(date -r $inFile '+%d' | bc)
+			remotedir=$remotedir"/"$(date -r $inFile '+%Y' | bc)"/"$(date -r $inFile '+%m' | bc)"/"$(date -r $inFile '+%d' | bc)
 	
 			cmd="ncftpput -V -t 10 -u $ftpuser -p $ftppassword -P 2121 -m $recordingremotehost"
-			eval $cmd "/$remotedir" $inFile >> $logFile 2>&1 # En el FTP hay una carpeta /GrabacionesWAV/2021/09/27
+			eval $cmd "$remotedir" $inFile >> $logFile 2>&1 # En el FTP hay una carpeta /GrabacionesWAV/2021/09/27
 			uploaded=$?
 			if [ "$uploaded" == 0 ]; then
 				logInfo "Files uploded ok to ftp server for id:$callIdentification" 
