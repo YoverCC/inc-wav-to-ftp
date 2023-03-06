@@ -80,7 +80,7 @@ Se debe editar con los datos correspondientes del servidor FTP y en el servidor 
     ftpuser="administrator"
     ftppassword="PassWordFTP123"
     recordingremotehost="10.150.71.3"
-    remotedir="/Speech\ Analytics"
+    remotedirPath="/Speech\ Analytics"
     ```
 
 El campo remotedir se debe configurar en caso este espeficado donde debe almacenarse, en el caso de Skytel si aplica dejarlo con "Speech Analytics", el caracter "\\" es usado para que se considere el espacio en el nombre de la carpeta, no debe modificarse en este caso. Si en otro ambiente va directamente en la raiz se puede dejar en blanco remotedir=""
