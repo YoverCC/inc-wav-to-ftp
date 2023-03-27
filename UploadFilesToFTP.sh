@@ -11,7 +11,7 @@ numberOfAudios=100
 timeForFile=1 # Tiempo de antiguedad del file para que se procese
 directory="/GrabacionesWAV"
 logFile="/tmp/LogUploadFilesToFTP.log"
-LogEnabled=1
+LogEnabled=0
 echo $logFile
 PATHFILES="/GrabacionesWAV/q$1"
 FAILEDPATH="/GrabacionesWAVFailed/q$1"
