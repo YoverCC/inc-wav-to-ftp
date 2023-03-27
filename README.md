@@ -32,14 +32,14 @@ mkdir /GrabacionesWAVFailed/qp
 
 ## 2. Copiar los scripts a la ruta /usr/sbin, dependiendo de si cuentan con un FTP o un SFTP
 
-- FTP:
+- **FTP:**
 
     ```
     cp /home/brt001spt/inicioGrab/UploadFilesToFTP.sh /usr/sbin/
     cp /home/brt001spt/inicioGrab/UploadFailedToFTP.sh /usr/sbin/
     ```
 
-- SFTP:
+- **SFTP:**
 
     ```
     cp /home/brt001spt/inicioGrab/UploadFilesToSFTP.sh /usr/sbin/
@@ -55,7 +55,7 @@ apt-get install lftp
 
 ## 3. Asegurar el formato unix y dar permisos a los archivos copiados, dependiendo de si cuentan con un FTP o un SFTP
 
-- FTP:
+- **FTP:**
 
     ```
     dos2unix /usr/sbin/UploadFilesToFTP.sh
@@ -66,7 +66,7 @@ apt-get install lftp
     chmod +x /usr/sbin/UploadFailedToFTP.sh
     ```
 
-- SFTP:
+- **SFTP:**
 
     ```
     dos2unix /usr/sbin/UploadFilesToSFTP.sh
@@ -83,7 +83,7 @@ apt-get install lftp
 nano /etc/crontab
 ```
 
-- FTP:
+- **FTP:**
 
     ```
     # WAV Files to MW
@@ -100,7 +100,7 @@ nano /etc/crontab
     * * * * * root /usr/sbin/UploadFailedToFTP.sh 5;
     ```
 
-- SFTP:
+- **SFTP:**
 
     ```
     # WAV Files to MW
@@ -120,7 +120,7 @@ nano /etc/crontab
 ## 5. Editar los archivos sh que suben al repositorio, segun corresponda al caso de aplicacion (FTP o SFTP)
 
 
-- FTP: /usr/sbin/UploadFilesToFTP.sh y /usr/sbin/UploadFailedToFTP.sh
+- **FTP: /usr/sbin/UploadFilesToFTP.sh y /usr/sbin/UploadFailedToFTP.sh**
 
 Se debe editar con los datos correspondientes del servidor FTP y en el servidor FTP se debe configurar la carpeta speechanalytics donde se dejaran los audios:
 
@@ -141,7 +141,7 @@ Adicionalmente se puede editar el puerto usado en el caso del FTP, el parametro 
 cmd="ncftpput -V -t 10 -u $ftpuser -p $ftppassword -P 2121 -m $recordingremotehost"
 ```
 
-- SFTP: /usr/sbin/UploadFilesToSFTP.sh y /usr/sbin/UploadFailedToSFTP.sh
+- **SFTP: /usr/sbin/UploadFilesToSFTP.sh y /usr/sbin/UploadFailedToSFTP.sh**
 
 Se debe editar con los datos correspondientes del servidor SFTP y en el servidor SFTP se debe configurar la carpeta speechanalytics donde se dejaran los audios:
 
