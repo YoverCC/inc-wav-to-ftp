@@ -1,8 +1,8 @@
 # SETUP PROCESO WAV TO FTP CUSTOM
 
-Generalmente se monta el procedimiento sobre PBX que tengan el mixeo en mp3, se requiere configurar el mixeo en wav (separado del mixeo nativo) para subirlo a un repositorio FTP que sera usado posteriormente por SpeechAnalytics o QA.
+Generalmente se monta el procedimiento sobre PBX que tengan el mixeo en mp3, se requiere configurar el mixeo en wav (separado del mixeo nativo) para subirlo a un repositorio FTP o SFTP que sera usado posteriormente por SpeechAnalytics o QA.
 
-Se recomienda que el FTP tenga un espacio de 3 TB aproximadamente (dependiendo de la cantidad de llamadas que tenga el cliente, adicional se debe considerar una depuración en el FTP a modo de que no se llene el FTP).
+Se recomienda que el FTP o SFTP tenga un espacio de 3 TB aproximadamente (dependiendo de la cantidad de llamadas que tenga el cliente, adicional se debe considerar una depuración en el FTP o SFTP a modo de que no se llene el FTP o SFTP).
 
 ## CONFIGURACIÓN
 
@@ -155,7 +155,7 @@ Se debe editar con los datos correspondientes del servidor SFTP y en el servidor
     remotedirPath="/speechanalytics"
     ```
 
-Nota: notese que se usa la comilla simple en el caso de la variable ftppassword, esto es por los caracteres especiales que pueda tener.
+Nota: Se usa la comilla simple en el caso de la variable ftppassword, esto es por los caracteres especiales que pueda tener.
 
 ## 6. Editar el archivo /usr/sbin/tkpostrecording.sh
 
