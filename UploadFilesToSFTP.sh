@@ -17,9 +17,9 @@ PATHFILES="/GrabacionesWAV/q$1"
 FAILEDPATH="/GrabacionesWAVFailed/q$1"
 inFile=""
 outFile=""
-ftpuser="nuevatel-user"
-ftppassword='a"plyPt}:AqYEzOwmwBc'
-recordingremotehost="usftpcorp.inconcertcc.com"
+ftpuser="usuario"
+ftppassword='a"contrasenia'
+recordingremotehost="usftpcorp.dominio.com"
 remotedirPath="/speechanalytics"
 remotedir=""
 
@@ -66,8 +66,8 @@ main(){
 			
 			remotedir=$remotedirPath"/"$(date -r $inFile '+%Y' | bc)"/"$(date -r $inFile '+%m' | bc)"/"$(date -r $inFile '+%d' | bc)
 			
-			cmd='lftp -u $ftpuser,$ftppassword sftp://$recordingremotehost -e "put -O $remotedir $inFile; bye"'
-			eval $cmd >> $logFile 2>&1 # En el SFTP hay una carpeta /GrabacionesWAV/2021/09/27
+			cmd='lftp -u $ftpuser,$ftppassword sftp://$recordingremotehost -e "mkdir -p $remotedir;put -O $remotedir $inFile; bye"'
+			eval $cmd >> $logFile 2>&1
 			uploaded=$?
 			if [ "$uploaded" == 0 ]; then
 				logInfo "Files uploded ok to sftp server for id:$callIdentification" 

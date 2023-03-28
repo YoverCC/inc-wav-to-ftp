@@ -67,7 +67,7 @@ main(){
 			remotedir=$remotedirPath"/"$(date -r $inFile '+%Y' | bc)"/"$(date -r $inFile '+%m' | bc)"/"$(date -r $inFile '+%d' | bc)
 			
 			cmd="ncftpput -V -t 10 -u $ftpuser -p $ftppassword -P 2121 -m $recordingremotehost"
-			eval $cmd "$remotedir" $inFile >> $logFile 2>&1 # En el FTP hay una carpeta /GrabacionesWAV/2021/09/27
+			eval $cmd "$remotedir" $inFile >> $logFile 2>&1
 			uploaded=$?
 			if [ "$uploaded" == 0 ]; then
 				logInfo "Files uploded ok to ftp server for id:$callIdentification" 

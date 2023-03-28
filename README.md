@@ -4,6 +4,8 @@ Generalmente se monta el procedimiento sobre PBX que tengan el mixeo en mp3, se 
 
 Se recomienda que el FTP o SFTP tenga un espacio de 3 TB aproximadamente (dependiendo de la cantidad de llamadas que tenga el cliente, adicional se debe considerar una depuración en el FTP o SFTP a modo de que no se llene el FTP o SFTP).
 
+Finalmente, es altamente recomendado en caso ser un SFTP ejecutar un test de la libreria SFTP y del proceso de subida utilizando un script colocado en este repositorio, para esto mirar el apartado [Libreria SFTP]
+
 ## CONFIGURACIÓN
 
 ## 0. Setup previo
@@ -46,12 +48,35 @@ mkdir /GrabacionesWAVFailed/qp
     cp /home/brt001spt/inicioGrab/UploadFailedToSFTP.sh /usr/sbin/
     ```
 
+## Libreria SFTP
+
 En caso sea SFTP probablemente se necesite instalar la libreria en el servidor lftp, para esto se puede ejecutar lo siguiente:
 
 ```
 apt-get update
 apt-get install lftp
 ```
+
+## Test SFTP libreria
+
+- Copio los archivos para testear la libreria
+
+    ```
+    cp /home/brt001spt/inicioGrab/test/test.sh /tmp/test.sh
+    cp /home/brt001spt/inicioGrab/test/example.txt /tmp/example.txt
+    ```
+
+- Actualizar los datos en test.sh segun los datos del repositorio SFTP
+
+- Dar permisos al script test.sh
+
+    ```
+    cd /tmp
+    dos2unix /tmp/test.sh
+    chmod +x test.sh
+    ```
+
+- Ejecutar test.sh y validar en el repositorio que se haya subido el archivo example.txt con las carpetas de /speechanalytics/anio/mes/dia, donde anio, mes, dia salen de la fecha del archivo generado en el servidor linux.
 
 ## 3. Asegurar el formato unix y dar permisos a los archivos copiados, dependiendo de si cuentan con un FTP o un SFTP
 
