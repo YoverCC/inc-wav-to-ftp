@@ -16,7 +16,7 @@ logError() {
 
 checkParams() {
 	  
-  logEnabled=1
+  logEnabled=0
 	configfile=/etc/asterisk/inconcert.conf
 	ftpuser='inconcert'
 	ftppassword='inconcert'

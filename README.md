@@ -1,18 +1,63 @@
-# SETUP PROCESO WAV TO FTP CUSTOM
+# PROCESO MIXEO EN WAV EN PBX Y SUBIDA DE AUDIOS A SFTP
 
-Generalmente se monta el procedimiento sobre PBX que tengan el mixeo en mp3, se requiere configurar el mixeo en wav (separado del mixeo nativo) para subirlo a un repositorio FTP o SFTP que sera usado posteriormente por SpeechAnalytics o QA.
+Speech Analytics habitualmente toma los audios Mixeados en WAV del repositorio de audios alojado en el MW, sin embargo dado que wav ocupa gran cantidad de espacio (se llego a observar en algunos clientes de más de 2TB en 3 meses), se decide configurar un proceso que lleve este Mixeo en WAV a un repositorio dedicado SFTP, para esto los pasos a configurar son los siguientes:
 
-Se recomienda que el FTP o SFTP tenga un espacio de 3 TB aproximadamente (dependiendo de la cantidad de llamadas que tenga el cliente, adicional se debe considerar una depuración en el FTP o SFTP a modo de que no se llene el FTP o SFTP).
+1. En cada PBX se configura el mixeo y la subida a un FTP alojado en un nodo de MW (MW1).
 
-Finalmente, es altamente recomendado en caso ser un SFTP ejecutar un test de la libreria SFTP y del proceso de subida utilizando un script colocado en este repositorio, para esto mirar el apartado [Libreria SFTP]
+2. En el MW1, se tiene el FTP con la carpeta que contiene los audios provenientes de todas las PBX del ambiente. Se debe configurar un windows service que se encargara de mover estos audios al repositorio SFTP indicado.
 
-## CONFIGURACIÓN
+3. En el MW1 adicionalmente, se deberá configurar un proceso diario (nocturno) que revise en el SFTP externo los audios del dia generados, los guarde en una tabla SQL y genere un csv en este repositorio.
 
-## 0. Setup previo
+Cada uno de estos puntos estan colocados en sus respectivas carpetas:
+
+1. PBX
+
+2. MW - Windows service
+
+3. _Pendiente_
+
+## 0. REPOSITORIOS:
+
+1. En el caso del SFTP, Infra entrega este repositorio segun solicitud, entregara dominio y credenciales y por default ellos realizan la retencion controlada de 3 meses de audios.
+
+2. En el caso del FTP en el MW, si no esta montado se tendra que configurar, para ello se debe configurar el sitio FTP en el IIS, aqui una serie de pasos a seguir para realizar esto (si ya se cuenta con FTP en el MW se puede pasar al siguiente punto de PBX):
+
+- Crear un usuario de grupo Guest para el FTP (este usuario sera el que se use en el proceso en la PBX y que tendra acceso al FTP del MW)
+Computer Management -> Local Users and Groups -> Add user, colocar una contraseña similar a la del administrador (esto por las restricciones en la contraseña, que deben tener cierta complejidad).
+
+![Imagen de referencia](assets/user.png)
+![Imagen de referencia](assets/usergroup.png)
+
+- Habilitar el modulo FTP
+
+![Imagen de referencia](assets/FTPservice.png)
+
+- Crear la carpeta FTPSpeech en el disco de negocio. Dentro de esta carpeta crear la carpeta speechanalytics.
+
+![Imagen de referencia](assets/folders.png)
+
+- Dar permisos FULL en la carpeta creada (FTPSpeech) al usuario creado.
+
+![Imagen de referencia](assets/folderpermission.png)
+
+- Configurar el FTP en el IIS, asignar el puerto disponible (de preferencia el 21) y configurar en la autenticacion al usuario generado.
+IIS -> Add site -> FTP site -> Not allow ssl, configure port -> Configurar autenticacion y usuario.
+
+![Imagen de referencia](assets/ftpconfig.png)
+
+- Validar con WinScp si se tiene conexion y acceso, desde las PBX validar que con un telnet al puerto 21 e IP del MW se pueda acceder.
+
+![Imagen de referencia](assets/winscptest.png)
+
+## 1. CONFIGURACIÓN PBX
+
+Generalmente se monta el procedimiento sobre PBX que tengan el mixeo en mp3, se requiere configurar el mixeo en wav (separado del mixeo nativo) para subirlo a un repositorio FTP o SFTP que sera usado posteriormente por SpeechAnalytics o QA. Se debe validar que el ambiente este configurado para generar audios en mp3 (revisando el archivo tkpostrecording.sh y inconcert.conf), en caso este aplicado la configuracion en wav debera aplicarse rollback a esa configuracion en una ventana. Rollback a las configuraciones indicadas en la guia: [https://inconcert.atlassian.net/wiki/spaces/i6Docs/pages/1126301763/C+mo+setear+el+formato+de+grabaci+n+de+audios+a+.wav]
+
+### a. Setup previo
 
 Copiar los archivos del repositorio en alguna carpeta de la PBX, a fines de la guia se llamara "inicioGrab", ubicado en /home/brt001spt
 
-## 1. Crear los directorios que se usaran en el proceso
+### b. Crear los directorios que se usaran en el proceso
  
 ```
 mkdir /GrabacionesWAV
@@ -32,7 +77,7 @@ mkdir /GrabacionesWAVFailed/q5
 mkdir /GrabacionesWAVFailed/qp
 ```
 
-## 2. Copiar los scripts a la ruta /usr/sbin, dependiendo de si cuentan con un FTP o un SFTP
+### c. Copiar los scripts a la ruta /usr/sbin:
 
 - **FTP:**
 
@@ -41,44 +86,8 @@ mkdir /GrabacionesWAVFailed/qp
     cp /home/brt001spt/inicioGrab/UploadFailedToFTP.sh /usr/sbin/
     ```
 
-- **SFTP:**
 
-    ```
-    cp /home/brt001spt/inicioGrab/UploadFilesToSFTP.sh /usr/sbin/
-    cp /home/brt001spt/inicioGrab/UploadFailedToSFTP.sh /usr/sbin/
-    ```
-
-## Libreria SFTP
-
-En caso sea SFTP probablemente se necesite instalar la libreria en el servidor lftp, para esto se puede ejecutar lo siguiente:
-
-```
-apt-get update
-apt-get install lftp
-```
-
-## Test SFTP libreria
-
-- Copio los archivos para testear la libreria
-
-    ```
-    cp /home/brt001spt/inicioGrab/test/test.sh /tmp/test.sh
-    cp /home/brt001spt/inicioGrab/test/example.txt /tmp/example.txt
-    ```
-
-- Actualizar los datos en test.sh segun los datos del repositorio SFTP
-
-- Dar permisos al script test.sh
-
-    ```
-    cd /tmp
-    dos2unix /tmp/test.sh
-    chmod +x test.sh
-    ```
-
-- Ejecutar test.sh y validar en el repositorio que se haya subido el archivo example.txt con las carpetas de /speechanalytics/anio/mes/dia, donde anio, mes, dia salen de la fecha del archivo generado en el servidor linux.
-
-## 3. Asegurar el formato unix y dar permisos a los archivos copiados, dependiendo de si cuentan con un FTP o un SFTP
+### d. Asegurar el formato unix y dar permisos a los archivos copiados:
 
 - **FTP:**
 
@@ -91,18 +100,7 @@ apt-get install lftp
     chmod +x /usr/sbin/UploadFailedToFTP.sh
     ```
 
-- **SFTP:**
-
-    ```
-    dos2unix /usr/sbin/UploadFilesToSFTP.sh
-    dos2unix /usr/sbin/UploadFailedToSFTP.sh
-    chown -R root:root /usr/sbin/UploadFilesToSFTP.sh
-    chmod +x /usr/sbin/UploadFilesToSFTP.sh
-    chown -R root:root /usr/sbin/UploadFailedToSFTP.sh
-    chmod +x /usr/sbin/UploadFailedToSFTP.sh
-    ```
-
-## 4. Programar crontab, se usa los scripts sh dependiendo si se cuenta con un FTP o un SFTP
+### e. Programar crontab, se usa los scripts sh:
 
 ```
 nano /etc/crontab
@@ -125,24 +123,7 @@ nano /etc/crontab
     * * * * * root /usr/sbin/UploadFailedToFTP.sh 5;
     ```
 
-- **SFTP:**
-
-    ```
-    # WAV Files to MW
-    * * * * * root /usr/sbin/UploadFilesToSFTP.sh 1;
-    * * * * * root /usr/sbin/UploadFilesToSFTP.sh 2;
-    * * * * * root /usr/sbin/UploadFilesToSFTP.sh 3;
-    * * * * * root /usr/sbin/UploadFilesToSFTP.sh 4;
-    * * * * * root /usr/sbin/UploadFilesToSFTP.sh 5;
-
-    * * * * * root /usr/sbin/UploadFailedToSFTP.sh 1;
-    * * * * * root /usr/sbin/UploadFailedToSFTP.sh 2;
-    * * * * * root /usr/sbin/UploadFailedToSFTP.sh 3;
-    * * * * * root /usr/sbin/UploadFailedToSFTP.sh 4;
-    * * * * * root /usr/sbin/UploadFailedToSFTP.sh 5;
-    ``` 
-
-## 5. Editar los archivos sh que suben al repositorio, segun corresponda al caso de aplicacion (FTP o SFTP)
+### f. Editar los archivos sh que suben al repositorio, segun corresponda al caso de aplicacion (FTP o SFTP)
 
 
 - **FTP: /usr/sbin/UploadFilesToFTP.sh y /usr/sbin/UploadFailedToFTP.sh**
@@ -156,33 +137,16 @@ Se debe editar con los datos correspondientes del servidor FTP y en el servidor 
     ftpuser="administrator"
     ftppassword="PassWordFTP123"
     recordingremotehost="10.150.71.3"
-    remotedirPath="/Speech\ Analytics"
-    ```
-
-El campo remotedir se debe configurar en caso este espeficado donde debe almacenarse, en el caso de Skytel si aplica dejarlo con "Speech Analytics", el caracter "\\" es usado para que se considere el espacio en el nombre de la carpeta, no debe modificarse en este caso. Si en otro ambiente va directamente en la raiz se puede dejar en blanco remotedir=""
-
-Adicionalmente se puede editar el puerto usado en el caso del FTP, el parametro -P 2121 es el puerto, que puede modificarse segun se requiera:
-```
-cmd="ncftpput -V -t 10 -u $ftpuser -p $ftppassword -P 2121 -m $recordingremotehost"
-```
-
-- **SFTP: /usr/sbin/UploadFilesToSFTP.sh y /usr/sbin/UploadFailedToSFTP.sh**
-
-Se debe editar con los datos correspondientes del servidor SFTP y en el servidor SFTP se debe configurar la carpeta speechanalytics donde se dejaran los audios:
-
-1. Crear carpeta "speechanalytics" en el servidor SFTP
-2. Editar los siguientes campos acorte a los datos del FTP:
-
-    ```
-    ftpuser="nuevatel-user"
-    ftppassword='a"plyPt}:AqYEzOwmwBc'
-    recordingremotehost="usftpcorp.inconcertcc.com"
     remotedirPath="/speechanalytics"
     ```
 
-Nota: Se usa la comilla simple en el caso de la variable ftppassword, esto es por los caracteres especiales que pueda tener.
+Se puede editar el puerto usado en el caso del FTP, el parametro -P 21 es el puerto, que puede modificarse segun se requiera:
 
-## 6. Editar el archivo /usr/sbin/tkpostrecording.sh
+```
+cmd="ncftpput -V -t 10 -u $ftpuser -p $ftppassword -P 21 -m $recordingremotehost"
+```
+
+### g. Editar el archivo /usr/sbin/tkpostrecording.sh
 
 Se recomienda en primer paso hacer un backup:
 
@@ -200,3 +164,34 @@ echo "$cmdDebian -M $recordingremotedir/$queueName/$out_file $recordingremotedir
 Tambien pueden visualizarlo en la imagen:
 
 ![Imagen de referencia](assets/tkpostrecording.png)
+
+## 2. CONFIGURACIÓN MW
+
+Se requiere solamente el archivo zip dentro de la carpeta MW - Windows service, adicionalmente en caso se requiera revisar la fuente se encuentra el proyecto.
+
+### a. Configuraciones previas
+
+- Contar con el FTP configurado.
+- Tener conectividad al SFTP destino (validado con WinSCP desde el servidor).
+
+### b. Deploy
+
+- Copiar el contenido del zip en una carpeta en la ruta: C:\Program Files (x86)\inConcert\Shared\inConcertSpeechRespaldoSFTP
+
+- Instalar el servicio:
+
+```
+- EJECUTO ESTO SI YA EXISTE EL SERVICIO:
+
+sc delete "inConcert SpeechRespaldoSFTP" 
+
+- PARA REGISTRARLO EJECUTO:
+
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\InstallUtil.exe "C:\Program Files (x86)\inConcert\Shared\inConcertSpeechRespaldoSFTP\inConcertSpeechRespaldoSFTP.exe"
+```
+
+- Editar el archivo de configuracion con los parametros del servidor (disco) / SFTP.
+
+![Imagen de referencia](assets/config.png)
+
+- El log quedara en la siguiente ruta: C:\Windows\SysWOW64\config\systemprofile\inConcert\Logs con el nombre de inConcertSpeechRespaldoSFTP.txt

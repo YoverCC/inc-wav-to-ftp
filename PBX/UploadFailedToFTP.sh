@@ -20,7 +20,7 @@ outFile=""
 ftpuser="administrator"
 ftppassword="PassWordFTP123"
 recordingremotehost="10.150.71.3"
-remotedirPath="/Speech\ Analytics"
+remotedirPath="/speechanalytics"
 remotedir=""
 
 
@@ -66,7 +66,7 @@ main(){
 						
 			remotedir=$remotedirPath"/"$(date -r $inFile '+%Y' | bc)"/"$(date -r $inFile '+%m' | bc)"/"$(date -r $inFile '+%d' | bc)
 	
-			cmd="ncftpput -V -t 10 -u $ftpuser -p $ftppassword -P 2121 -m $recordingremotehost"
+			cmd="ncftpput -V -t 10 -u $ftpuser -p $ftppassword -P 21 -m $recordingremotehost"
 			eval $cmd "$remotedir" $inFile >> $logFile 2>&1
 			uploaded=$?
 			if [ "$uploaded" == 0 ]; then

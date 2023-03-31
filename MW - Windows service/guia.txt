@@ -1,0 +1,12 @@
+- EL COMPILADO SE ENCUENTRA EN 
+
+inConcertSpeechRespaldoSFTP.zip
+
+- EJECUTO ESTO SI YA EXISTE EL SERVICIO:
+
+sc delete "inConcert SpeechRespaldoSFTP" 
+
+- PARA REGISTRARLO EJECUTO:
+
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\InstallUtil.exe "C:\Program Files (x86)\inConcert\Shared\inConcertSpeechRespaldoSFTP\inConcertSpeechRespaldoSFTP.exe"
+
